@@ -31,6 +31,13 @@ var _ = Describe("Select", func() {
 		Expect(string(b)).To(Equal("SELECT * WHERE (hello = 'world')"))
 	})
 
+	It("supports locking", func() {
+		q := NewQuery(nil).For("UPDATE SKIP LOCKED")
+		b, err := selectQuery{Query: q}.AppendQuery(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(b)).To(Equal(`SELECT * FOR UPDATE SKIP LOCKED`))
+	})
+
 	It("specifies all columns", func() {
 		q := NewQuery(nil, &SelectModel{})
 

@@ -36,10 +36,16 @@ type Query struct {
 	returning  []queryParamsAppender
 	limit      int
 	offset     int
+	selFor     FormatAppender
 }
 
 func NewQuery(db DB, model ...interface{}) *Query {
 	return (&Query{}).DB(db).Model(model...)
+}
+
+func (q *Query) For(s string, params ...interface{}) *Query {
+	q.selFor = queryParamsAppender{s, params}
+	return q
 }
 
 // New returns new zero Query binded to the current db and model.
@@ -72,6 +78,7 @@ func (q *Query) Copy() *Query {
 		returning:  q.returning[:],
 		limit:      q.limit,
 		offset:     q.offset,
+		selFor:     q.selFor,
 	}
 	for _, with := range q.with {
 		copy = copy.With(with.name, with.query.Copy())
